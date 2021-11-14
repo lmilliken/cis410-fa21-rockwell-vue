@@ -1,6 +1,9 @@
 <template>
   <div>
     <h1>Login</h1>
+    <div v-if="this.$route.query.signupsuccess" class="alert alert-success">
+      Thanks for signin up, please log in now.
+    </div>
   </div>
 </template>
 
