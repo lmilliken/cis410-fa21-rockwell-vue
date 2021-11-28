@@ -19,6 +19,7 @@ export default {
   },
   created() {
     this.$store.dispatch("getMovies");
+    this.$store.dispatch("tryAutoLogin");
   },
 };
 </script>

@@ -38,11 +38,48 @@ export default createStore({
         })
         .then(() => {
           commit("clearAuthData");
+          localStorage.clear("token");
+          localStorage.clear("expiration");
           myRoutes.replace("/");
         })
         .catch(() => {
           console.log("error in loggins out");
         });
+    },
+    tryAutoLogin({ commit }) {
+      let token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+
+      let expirationDate = new Date(localStorage.getItem("expiration"));
+      let now = new Date();
+      if (now >= expirationDate) {
+        return;
+      }
+
+      axios
+        .get("/contacts/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((theResponse) => {
+          commit("storeUserInApp", theResponse.data);
+          commit("storeTokenInApp", token);
+          this.dispatch("setLogoutTimer");
+        })
+        .catch(() => {
+          myRoutes.replace("/");
+        });
+    },
+    setLogoutTimer({ dispatch }) {
+      let expirationDate = new Date(localStorage.getItem("expiration"));
+      let now = new Date();
+      let timeLeft = expirationDate - now;
+      setTimeout(() => {
+        dispatch("logout");
+      }, timeLeft);
     },
   },
 });
